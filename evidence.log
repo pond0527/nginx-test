@@ -1,0 +1,43 @@
+ikedaakiranoMacBook-Pro:nginx-openresty tetsu$ curl -H "Content-Type: application/json" -X POST -d @$(pwd)/test.json http://127.0.0.1:8080/test2 | tee -a evidence.log
+Text
+{    "foo": 123}
+string
+Value
+123
+table
+0
+
+
+
+===========- config ===============
+location /test2 {
+      access_by_lua_block{
+                        local cjson = require("cjson")
+                        ngx.req.read_body()
+                        local text = ngx.var.request_body
+                        ngx.say("Text")
+                        ngx.say(text)
+                        ngx.say(type(text))
+
+                        local value = cjson.decode(text)
+                        ngx.say("Value")
+                        ngx.say(value["foo"])
+                        ngx.say(type(value))
+                        ngx.say(table.getn(value))
+
+                        -- for k,v in pairs(value) do
+                            -- ngx.say("Key-Value")
+                            -- ngx.say(k)
+                            -- ngx.say(v)
+                            -- ngx.say(table.getn(v))
+
+                            -- ngx.say(" --- begin: vv print  ---")
+                            -- for _, vv in pairs(v) do
+                            --    ngx.say(_)
+                            --    ngx.say(vv)
+                            -- end
+                            -- ngx.say(" --- ends: vv print  ---")
+                        -- end
+      }
+  }
+
